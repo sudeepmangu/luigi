@@ -377,7 +377,8 @@ class OptParseInterface(Interface):
 
 def load_task(module, task_name, params_str):
     """ Imports task dynamically given a module and a task name"""
-    __import__(module)
+    if module is not None:
+        __import__(module)
     task_cls = Register.get_task_cls(task_name)
     return task_cls.from_str_params(params_str)
 

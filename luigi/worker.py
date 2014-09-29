@@ -195,7 +195,7 @@ class Worker(object):
     def __init__(self, scheduler=CentralPlannerScheduler(), worker_id=None,
                  worker_processes=1, ping_interval=None, keep_alive=None,
                  wait_interval=None, max_reschedules=None, count_uniques=None,
-                 worker_timeout=None):
+                 worker_timeout=None, slave=False):
         self.worker_processes = int(worker_processes)
         self._worker_info = self._generate_worker_info()
 
@@ -241,6 +241,8 @@ class Worker(object):
         self.add_succeeded = True
         self.run_succeeded = True
         self.unfulfilled_counts = collections.defaultdict(int)
+
+        self.slave = slave
 
         class KeepAliveThread(threading.Thread):
 
@@ -474,7 +476,7 @@ class Worker(object):
 
     def _get_work(self):
         logger.debug("Asking scheduler for work...")
-        r = self._scheduler.get_work(worker=self._id, host=self.host)
+        r = self._scheduler.get_work(worker=self._id, host=self.host, slave=self.slave)
         # Support old version of scheduler
         if isinstance(r, tuple) or isinstance(r, list):
             n_pending_tasks, task_id = r
@@ -486,6 +488,15 @@ class Worker(object):
             running_tasks = r['running_tasks']
             # support old version of scheduler
             n_unique_pending = r.get('n_unique_pending', 0)
+
+        if task_id is not None and task_id not in self._scheduled_tasks:
+            logger.info('Did not schedule %s, will load it dynamically', task_id)
+            # TODO: we should obtain the module name from the server!
+            self._scheduled_tasks[task_id] = \
+                interface.load_task(module=None,
+                                    task_name=r['task_family'],
+                                    params_str=r['task_params'])
+
         return task_id, running_tasks, n_pending_tasks, n_unique_pending
 
     def _run_task(self, task_id):
