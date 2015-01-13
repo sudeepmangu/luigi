@@ -15,7 +15,7 @@
 import fnmatch
 import datetime
 import luigi
-from luigi.tools.range import RangeEvent, RangeHourly, RangeHourlyBase, _constrain_glob
+from luigi.tools.range import RangeEvent, RangeHourly, RangeHourlyBase, _constrain_glob, _get_filesystems_and_globs
 from luigi.mock import MockFile, MockFileSystem
 import mock
 import time
@@ -303,7 +303,7 @@ class RangeHourlyBaseTest(unittest.TestCase):
 
 class RangeHourlyTest(unittest.TestCase):
     def _test_filesystems_and_globs(self, task_cls, expected):
-        actual = list(RangeHourly._get_filesystems_and_globs(task_cls))
+        actual = list(_get_filesystems_and_globs(task_cls))
         self.assertEqual(len(actual), len(expected))
         for (actual_filesystem, actual_glob), (expected_filesystem, expected_glob) in zip(actual, expected):
             self.assertTrue(isinstance(actual_filesystem, expected_filesystem))
