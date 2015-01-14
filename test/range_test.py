@@ -301,22 +301,6 @@ class RangeHourlyBaseTest(unittest.TestCase):
         )
 
 
-class BulkCompleteTask(luigi.Task):
-    dh = luigi.DateHourParameter()
-
-    def bulk_complete(self, parameter_tuples):
-        return parameter_tuples[:-2]
-
-    def output(self):
-        raise RuntimeError("Shouldn't get called while resolving deps via bulk_complete")
-
-
-expected_bulk_complete = [
-    'BulkCompleteTask(dh=2015-11-30T22)',
-    'BulkCompleteTask(dh=2015-11-30T23)',
-]
-
-
 class RangeHourlyTest(unittest.TestCase):
     def _test_filesystems_and_globs(self, task_cls, expected):
         actual = list(_get_filesystems_and_globs(task_cls))
@@ -356,9 +340,24 @@ class RangeHourlyTest(unittest.TestCase):
         self.assertEqual(actual, expected_wrapper)
 
     def test_bulk_complete_correctly_interfaced(self):
+        class BulkCompleteTask(luigi.Task):
+            dh = luigi.DateHourParameter()
+
+            def bulk_complete(self, parameter_tuples):
+                return parameter_tuples[:-2]
+
+            def output(self):
+                raise RuntimeError("Shouldn't get called while resolving deps via bulk_complete")
+
         task = RangeHourly(now=datetime_to_epoch(datetime.datetime(2015, 12, 1)),
                            of='BulkCompleteTask',
                            start=datetime.datetime(2015, 11, 1),
                            stop=datetime.datetime(2015, 12, 1))
+
+        expected = [
+            'BulkCompleteTask(dh=2015-11-30T22)',
+            'BulkCompleteTask(dh=2015-11-30T23)',
+        ]
+
         actual = [t.task_id for t in task.requires()]
-        self.assertEqual(actual, expected_bulk_complete)
+        self.assertEqual(actual, expected)
