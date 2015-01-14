@@ -343,6 +343,7 @@ class RangeHourlyTest(unittest.TestCase):
         class BulkCompleteTask(luigi.Task):
             dh = luigi.DateHourParameter()
 
+            @classmethod
             def bulk_complete(self, parameter_tuples):
                 return parameter_tuples[:-2]
 

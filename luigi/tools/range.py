@@ -317,6 +317,6 @@ class RangeHourly(RangeHourlyBase):
     """
     def missing_datehours(self, task_cls, finite_datehours):
         try:
-            return set(finite_datehours) - set(task_cls.bulk_complete.__func__(task_cls, finite_datehours))
+            return set(finite_datehours) - set(task_cls.bulk_complete(finite_datehours))
         except NotImplementedError:
             return _infer_bulk_complete_from_fs(task_cls, finite_datehours)
