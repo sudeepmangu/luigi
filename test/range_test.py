@@ -154,12 +154,15 @@ class RangeDailyBaseTest(unittest.TestCase):
         @RangeDailyBase.event_handler(RangeEvent.DELAY)
         def callback_delay(*args):
             self.events.setdefault(RangeEvent.DELAY, []).append(args)
+
         @RangeDailyBase.event_handler(RangeEvent.COMPLETE_COUNT)
         def callback_complete_count(*args):
             self.events.setdefault(RangeEvent.COMPLETE_COUNT, []).append(args)
+
         @RangeDailyBase.event_handler(RangeEvent.COMPLETE_FRACTION)
         def callback_complete_fraction(*args):
             self.events.setdefault(RangeEvent.COMPLETE_FRACTION, []).append(args)
+
         self.events = {}
 
     def test_consistent_formatting(self):
@@ -176,7 +179,7 @@ class RangeDailyBaseTest(unittest.TestCase):
                 return args[-1][:5]
 
         task = RangeDailyDerived(of='CommonDateTask',
-                                  **kwargs)
+                                 **kwargs)
         self.assertEqual(task.requires(), [])
         self.assertEqual(calls, [])
         self.assertEqual(task.requires(), [])
@@ -216,7 +219,7 @@ class RangeDailyBaseTest(unittest.TestCase):
                 return args[-1][:7]
 
         task = RangeDailyDerived(of='CommonDateTask',
-                                  **kwargs)
+                                 **kwargs)
         self.assertEqual(map(str, task.requires()), expected_requires)
         self.assertEqual(calls[0][1], CommonDateTask)
         self.assertEqual((min(calls[0][2]), max(calls[0][2])), expected_finite_datetimes_range)
@@ -264,12 +267,15 @@ class RangeHourlyBaseTest(unittest.TestCase):
         @RangeHourlyBase.event_handler(RangeEvent.DELAY)
         def callback_delay(*args):
             self.events.setdefault(RangeEvent.DELAY, []).append(args)
+
         @RangeHourlyBase.event_handler(RangeEvent.COMPLETE_COUNT)
         def callback_complete_count(*args):
             self.events.setdefault(RangeEvent.COMPLETE_COUNT, []).append(args)
+
         @RangeHourlyBase.event_handler(RangeEvent.COMPLETE_FRACTION)
         def callback_complete_fraction(*args):
             self.events.setdefault(RangeEvent.COMPLETE_FRACTION, []).append(args)
+
         self.events = {}
 
     def test_consistent_formatting(self):

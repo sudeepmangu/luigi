@@ -71,9 +71,9 @@ class RangeBase(luigi.WrapperTask):
     different parameter naming, e.g. days_back/forward, hours_back/forward,
     ..., as well as different documentation wording, for good user experience.)
     """
+    # TODO lift the single parameter constraint by passing unknown parameters through WrapperTask?
     of = luigi.Parameter(
         description="task name to be completed. The task must take a single datetime parameter")
-        # TODO lift the single parameter constraint by passing unknown parameters through WrapperTask?
     # The common parameters 'start' and 'stop' have type (e.g. DateParameter,
     # DateHourParameter) dependent on the concrete subclass, cumbersome to
     # define here generically without dark magic. Refer to the overrides.
@@ -248,7 +248,7 @@ class RangeHourlyBase(RangeBase):
     hours_back = luigi.IntParameter(
         default=100 * 24,  # slightly more than three months
         description="extent to which contiguousness is to be assured into past, in hours from current time. Prevents infinite loop when start is none. If the dataset has limited retention (i.e. old outputs get removed), this should be set shorter to that, too, to prevent the oldest outputs flapping. Increase freely if you intend to process old dates - worker's memory is the limit")
-        # TODO always entire interval for reprocessings (fixed start and stop)?
+    # TODO always entire interval for reprocessings (fixed start and stop)?
     hours_forward = luigi.IntParameter(
         default=0,
         description="extent to which contiguousness is to be assured into future, in hours from current time. Prevents infinite loop when stop is none")
@@ -339,7 +339,7 @@ def _get_per_location_glob(tasks, outputs, regexes):
     don't even have to retrofit existing tasks anyhow.
     """
     paths = [o.path for o in outputs]
-    matches = [r.search(p) for r, p in zip(regexes, paths)]  #  naive, because some matches could be confused by numbers earlier in path, e.g. /foo/fifa2000k/bar/2000-12-31/00
+    matches = [r.search(p) for r, p in zip(regexes, paths)]  # naive, because some matches could be confused by numbers earlier in path, e.g. /foo/fifa2000k/bar/2000-12-31/00
 
     for m, p, t in zip(matches, paths, tasks):
         if m is None:
