@@ -162,6 +162,11 @@ class RangeDailyBaseTest(unittest.TestCase):
             self.events.setdefault(RangeEvent.COMPLETE_FRACTION, []).append(args)
         self.events = {}
 
+    def test_consistent_formatting(self):
+        task = RangeDailyBase(of='CommonDateTask',
+                              start=datetime.date(2016, 1, 1))
+        self.assertEqual(task._format_range([datetime.datetime(2016, 1, 2, 13), datetime.datetime(2016, 2, 29, 23)]), '[2016-01-02, 2016-02-29]')
+
     def _empty_subcase(self, kwargs, expected_events):
         calls = []
 
@@ -266,6 +271,11 @@ class RangeHourlyBaseTest(unittest.TestCase):
         def callback_complete_fraction(*args):
             self.events.setdefault(RangeEvent.COMPLETE_FRACTION, []).append(args)
         self.events = {}
+
+    def test_consistent_formatting(self):
+        task = RangeHourlyBase(of='CommonDateHourTask',
+                               start=datetime.datetime(2016, 1, 1))
+        self.assertEqual(task._format_range([datetime.datetime(2016, 1, 2, 13), datetime.datetime(2016, 2, 29, 23)]), '[2016-01-02T13, 2016-02-29T23]')
 
     def _empty_subcase(self, kwargs, expected_events):
         calls = []
